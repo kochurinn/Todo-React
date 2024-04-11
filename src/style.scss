@@ -1,0 +1,54 @@
+.wrapper {
+    font-size: 25px;
+    .newList {
+        opacity: .4;
+        margin-bottom: 20px;
+        cursor: pointer;
+        &:hover {
+            opacity: .8;
+        }
+    }
+    .input {
+        display: flex;
+        margin-bottom: 20px;
+        div {
+            margin-left: 20px;
+            opacity: .4;
+            cursor: pointer;
+            &:hover {
+                opacity: .8;
+            }
+        }
+    }
+    .activeTasksList {
+        margin-bottom: 20px;
+        button {
+            cursor: pointer;
+        }
+        input {
+            margin: 0 10px 0 10px;
+            cursor: pointer;
+        }
+    }
+    .doneTasksList {
+        margin-bottom: 20px;
+        button {
+            cursor: pointer;
+        }
+        input {
+            margin: 0 10px 0 10px;
+            cursor: pointer;
+        }
+        .taskName {
+            text-decoration: line-through;
+            opacity: .5;
+        }
+    }
+    .removeDoneTasks {
+        opacity: .4;
+        cursor: pointer;
+        &:hover {
+            opacity: .8;
+        }
+    }
+}
