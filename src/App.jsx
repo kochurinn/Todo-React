@@ -3,9 +3,9 @@ import React from "react"
 function App() {
   const [value, setValue] = React.useState('')
   const [id, setId] = React.useState(1)
-  const [activeTasks, setActiveTasks] = React.useState([])
-  const [doneTasks, setDoneTask] = React.useState([])
-
+  const [activeTasks, setActiveTasks] = React.useState(JSON.parse(localStorage.getItem('activeTasks')) || [])
+  const [doneTasks, setDoneTasks] = React.useState(JSON.parse(localStorage.getItem('doneTasks')) || [])
+  
   const onCreateTask = () => {
     if (!value) return
     const task = {
@@ -14,42 +14,52 @@ function App() {
     }
     setId(id + 1)
     setActiveTasks([...activeTasks, task])
+    localStorage.setItem('activeTasks', JSON.stringify([...activeTasks, task]))
     setValue('')
   }
 
   const onDeleteActiveTask = (id) => {
-    setActiveTasks(activeTasks.filter(task => task.id !== id))
+    const filterActiveTasks = activeTasks.filter(task => task.id !== id)
+    setActiveTasks(filterActiveTasks)
+    localStorage.setItem('activeTasks', JSON.stringify(filterActiveTasks))
   }
 
   const onDeleteDoneTask = (id) => {
-    setDoneTask(doneTasks.filter(task => task.id !== id))
+    const filterDoneTasks =  doneTasks.filter(task => task.id !== id)
+    setDoneTasks(filterDoneTasks)
+    localStorage.setItem('doneTasks', JSON.stringify(filterDoneTasks))
   }
 
   const onDone = (id) => {
-    setActiveTasks(activeTasks.filter(task => task.id !== id))
+    const filterActiveTasks = activeTasks.filter(task => task.id !== id)
     const task = activeTasks.find(task => task.id === id)
-    setDoneTask([...doneTasks, task])
+    const newDoneTasks = [...doneTasks, task]
+    setActiveTasks(filterActiveTasks)
+    setDoneTasks(newDoneTasks)
+    localStorage.setItem('activeTasks', JSON.stringify(filterActiveTasks))
+    localStorage.setItem('doneTasks', JSON.stringify(newDoneTasks))
   }
 
   const onUnDone = (id) => {
-    setDoneTask(doneTasks.filter(task => task.id !== id))
+    const filterDoneTasks = doneTasks.filter(task => task.id !== id)
     const task = doneTasks.find(task => task.id === id)
-    setActiveTasks([...activeTasks, task])
+    const newActiveTasks = [...activeTasks, task]
+    setDoneTasks(filterDoneTasks)
+    setActiveTasks(newActiveTasks)
+    localStorage.setItem('doneTasks', JSON.stringify(filterDoneTasks))
+    localStorage.setItem('activeTasks', JSON.stringify(newActiveTasks))
   }
 
   const onCreateNewList = () => {
     setActiveTasks([])
-    setDoneTask([])
+    setDoneTasks([])
+    localStorage.removeItem('activeTasks')
+    localStorage.removeItem('doneTasks')
   }
 
   const onDeleteAllDoneTasks = () => {
-    setDoneTask([])
-  }
-
-  const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
-      setValue
-    }
+    setDoneTasks([])
+    localStorage.removeItem('doneTasks')
   }
 
   return (
@@ -60,7 +70,7 @@ function App() {
         type="text" 
         value={value}
         onChange={e => setValue(e.target.value)}
-        onKeyPress={this.handleKeyPress}
+        onKeyDown={e => e.key === 'Enter' ? setValue(e.target.value) : null}
         placeholder="Новая задача"
       />
       <div onClick={onCreateTask}>Enter</div>
