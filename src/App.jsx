@@ -1,11 +1,12 @@
-import React from "react"
+import { useState } from "react"
+import Tasks from './Tasks'
 
 function App() {
-  const [value, setValue] = React.useState('')
-  const [id, setId] = React.useState(1)
-  const [activeTasks, setActiveTasks] = React.useState(JSON.parse(localStorage.getItem('activeTasks')) || [])
-  const [doneTasks, setDoneTasks] = React.useState(JSON.parse(localStorage.getItem('doneTasks')) || [])
-  
+  const [value, setValue] = useState('')
+  const [id, setId] = useState(+localStorage.getItem('count') || 1)
+  const [activeTasks, setActiveTasks] = useState(JSON.parse(localStorage.getItem('activeTasks')) || [])
+  const [doneTasks, setDoneTasks] = useState(JSON.parse(localStorage.getItem('doneTasks')) || [])
+
   const onCreateTask = () => {
     if (!value) return
     const task = {
@@ -13,6 +14,7 @@ function App() {
       text: value
     }
     setId(id + 1)
+    localStorage.setItem('count', id + 1)
     setActiveTasks([...activeTasks, task])
     localStorage.setItem('activeTasks', JSON.stringify([...activeTasks, task]))
     setValue('')
@@ -25,7 +27,7 @@ function App() {
   }
 
   const onDeleteDoneTask = (id) => {
-    const filterDoneTasks =  doneTasks.filter(task => task.id !== id)
+    const filterDoneTasks = doneTasks.filter(task => task.id !== id)
     setDoneTasks(filterDoneTasks)
     localStorage.setItem('doneTasks', JSON.stringify(filterDoneTasks))
   }
@@ -63,40 +65,28 @@ function App() {
   }
 
   return (
-  <div className="wrapper">
-    <div onClick={onCreateNewList} className="newList">Начать новый список</div>
-    <div className="input">
-      <input 
-        type="text" 
-        value={value}
-        onChange={e => setValue(e.target.value)}
-        onKeyDown={e => e.key === 'Enter' ? setValue(e.target.value) : null}
-        placeholder="Новая задача"
+    <div className="wrapper">
+      <div onClick={onCreateNewList} className="newList">Начать новый список</div>
+      <div className="input">
+        <input
+          type="text"
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' ? onCreateTask() : null}
+          placeholder="Новая задача"
+        />
+        <div onClick={onCreateTask}>Enter</div>
+      </div>
+      <Tasks
+        activeTasks={activeTasks}
+        doneTasks={doneTasks}
+        onDeleteActiveTask={onDeleteActiveTask}
+        onDeleteDoneTask={onDeleteDoneTask}
+        onDone={onDone}
+        onUnDone={onUnDone}
       />
-      <div onClick={onCreateTask}>Enter</div>
+      <div onClick={onDeleteAllDoneTasks} className="removeDoneTasks">Удалить выполненные</div>
     </div>
-    <div className="activeTasksList">
-      {activeTasks.map((task, index) => (
-        <div key={task.id} className="activeTask">
-          <button onClick={() => onDeleteActiveTask(task.id)}>delete</button>
-          <input 
-            onChange={() => onDone(task.id)}
-            type="checkbox"/>
-          <span className="taskName">{index + 1}. {task.text}</span>
-        </div>
-      ))}
-    </div>
-    <div className="doneTasksList">
-      {doneTasks.map((task) => (
-        <div key={task.id} className="doneTask">
-          <button onClick={() => onDeleteDoneTask(task.id)}>delete</button>
-          <input onChange={() => onUnDone(task.id)} type="checkbox" checked/>
-          <span className="taskName">{task.text}</span>
-        </div>
-      ))}
-    </div>
-    <div onClick={onDeleteAllDoneTasks} className="removeDoneTasks">Удалить выполненные</div>
-  </div>
   )
 }
 
